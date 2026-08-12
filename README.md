@@ -1,3 +1,5 @@
+<img width="1147" height="1225" alt="diagrama atualizado2" src="https://github.com/user-attachments/assets/30c8b028-4640-476d-8df0-89b51ac32fa2" />
+
 # Painel de Moedas e Economia
 
 Projeto desenvolvido em Python utilizando Programação Orientada a Objetos.
