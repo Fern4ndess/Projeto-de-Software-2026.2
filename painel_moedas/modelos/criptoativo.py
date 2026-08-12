@@ -1,12 +1,24 @@
+from decimal import Decimal
+
 from modelos.instrumento import Instrumento
+
 
 class Criptoativo(Instrumento):
 
-    def __init__(self, codigo):
-        super().__init__(codigo)
-
     def calcular_volatilidade(self):
-        return "Volatilidade calculada com base em 24 horas (implementação futura)."
+        return (
+            "Critério: preços horários "
+            "em uma janela de 24 horas."
+        )
+
+    def formatar_valor(self, valor):
+        valor = Decimal(str(valor))
+
+        return (
+            f"{self.codigo} {valor:.8f}"
+        )
 
     def __str__(self):
-        return f"Criptoativo: {self.codigo}"
+        return (
+            f"{self.codigo} - Criptoativo"
+        )
