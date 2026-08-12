@@ -1,41 +1,44 @@
-# Painel de Moedas e Economia
+#  Painel de Moedas e Economia
 
-Projeto desenvolvido em Python utilizando Programação Orientada a Objetos.
+Projeto desenvolvido em **Python** utilizando Programação Orientada a Objetos (POO).
 
-## Status
+O sistema representa uma carteira com moedas fiduciárias e criptoativos,
+trabalhando com cotações, posições e operações financeiras protegidas.
 
-Em desenvolvimento.
+> **Status: Em desenvolvimento — RF1 até RF7**
 
-## Requisitos implementados
+## 🛠 Tecnologias
 
-- RF1 - Cotações imutáveis
-- RF2 - Sem mistura implícita de moedas
-- RF3 - Duas famílias de instrumentos
-- RF4 - Critérios específicos para Fiat e Cripto
-- RF5 - Carteira com posições heterogêneas
-- RF6 - Provedores de cotação
-- RF7 - Carteira protegida
+- Python 3
+- Programação Orientada a Objetos
+- `Decimal`
+- PlantUML
 
-## Funcionamento atual
+## 📋 Requisitos implementados
 
-O sistema possui um menu interativo e permite entrada de
-dados pelo usuário.
+| RF | Descrição |
+|---|---|
+| RF1 | Cotações imutáveis |
+| RF2 | Sem mistura implícita de moedas |
+| RF3 | Moedas fiduciárias e criptoativos |
+| RF4 | Exibição apropriada ao tipo |
+| RF5 | Avaliação mista da carteira |
+| RF6 | Cotações multifonte |
+| RF7 | Carteira protegida |
 
-As cotações utilizadas nesta etapa são simuladas.
+## 📁 Estrutura
 
-## APIs
-
-As APIs Frankfurter e CoinGecko ainda não fazem parte
-desta etapa do projeto.
-
-## Execução
-
-Executar:
-
-python main.py
-
-## Status do projeto
-
-Em desenvolvimento.
-
-Novos requisitos funcionais serão adicionados posteriormente.
+```text
+painel_moedas/
+│
+├── modelos/
+├── provedores/
+├── servicos/
+├── diagrama/
+│   ├── diagrama_classes.puml
+│   └── diagrama_classes.png
+│
+├── main.py
+├── README.md
+├── requirements.txt
+└── .gitignore
