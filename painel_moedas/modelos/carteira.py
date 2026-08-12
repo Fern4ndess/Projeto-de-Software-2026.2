@@ -8,11 +8,7 @@ class Carteira:
     def __init__(self):
         self.__posicoes = []
 
-    def adicionar_posicao(
-        self,
-        instrumento,
-        quantidade
-    ):
+    def adicionar_posicao(self, instrumento, quantidade):
 
         posicao = Posicao(
             instrumento,
@@ -22,6 +18,7 @@ class Carteira:
         self.__posicoes.append(posicao)
 
     def obter_posicoes(self):
+
         return tuple(self.__posicoes)
 
     def calcular_total(self, servico):
@@ -70,6 +67,10 @@ class Carteira:
         )
 
 
+# ==========================================================
+# RF7 - CARTEIRA PROTEGIDA
+# ==========================================================
+
 class CarteiraProtegida:
 
     def __init__(self, saldo_inicial):
@@ -86,9 +87,59 @@ class CarteiraProtegida:
         self.__saldo = saldo_inicial
         self.__posicoes = []
 
+    # ------------------------------------------------------
+    # CONSULTA DO SALDO
+    # ------------------------------------------------------
+
     @property
     def saldo(self):
         return self.__saldo
+
+    # ------------------------------------------------------
+    # ENTRADA DE DINHEIRO
+    # ------------------------------------------------------
+
+    def depositar(self, valor):
+
+        valor = Decimal(
+            str(valor)
+        )
+
+        if valor <= Decimal("0"):
+            raise ValueError(
+                "O valor do depósito deve ser "
+                "maior que zero."
+            )
+
+        self.__saldo += valor
+
+    # ------------------------------------------------------
+    # SAÍDA DE DINHEIRO
+    # ------------------------------------------------------
+
+    def sacar(self, valor):
+
+        valor = Decimal(
+            str(valor)
+        )
+
+        if valor <= Decimal("0"):
+            raise ValueError(
+                "O valor do saque deve ser "
+                "maior que zero."
+            )
+
+        if valor > self.__saldo:
+            raise ValueError(
+                "Saldo insuficiente para realizar "
+                "o saque."
+            )
+
+        self.__saldo -= valor
+
+    # ------------------------------------------------------
+    # COMPRA DE ATIVO
+    # ------------------------------------------------------
 
     def comprar(
         self,
@@ -107,17 +158,20 @@ class CarteiraProtegida:
 
         if quantidade <= Decimal("0"):
             raise ValueError(
-                "A quantidade deve ser maior que zero."
+                "A quantidade deve ser "
+                "maior que zero."
             )
 
         if valor_total <= Decimal("0"):
             raise ValueError(
-                "O valor da operação deve ser maior que zero."
+                "O valor da operação deve ser "
+                "maior que zero."
             )
 
         if valor_total > self.__saldo:
             raise ValueError(
-                "Saldo insuficiente."
+                "Saldo insuficiente para realizar "
+                "a compra."
             )
 
         self.__saldo -= valor_total
@@ -129,12 +183,18 @@ class CarteiraProtegida:
             )
         )
 
+    # ------------------------------------------------------
+    # LISTAGEM DAS POSIÇÕES
+    # ------------------------------------------------------
+
     def listar_posicoes(self):
 
         if not self.__posicoes:
+
             print(
                 "\nNenhuma posição cadastrada."
             )
+
             return
 
         print("\nPOSIÇÕES PROTEGIDAS")
