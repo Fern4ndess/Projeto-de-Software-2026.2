@@ -24,8 +24,12 @@ def ler_decimal(mensagem):
     """
 
     while True:
+
         try:
-            valor = input(mensagem).strip().replace(",", ".")
+            valor = input(mensagem).strip()
+
+            # Permite que o usuário digite 10,50
+            valor = valor.replace(",", ".")
 
             numero = Decimal(valor)
 
@@ -36,7 +40,10 @@ def ler_decimal(mensagem):
             return numero
 
         except InvalidOperation:
-            print("Valor inválido. Digite um número.")
+            print(
+                "Valor inválido. "
+                "Digite um número válido."
+            )
 
 
 def ler_quantidade(mensagem):
@@ -45,10 +52,13 @@ def ler_quantidade(mensagem):
     """
 
     while True:
+
         valor = ler_decimal(mensagem)
 
         if valor <= Decimal("0"):
-            print("A quantidade deve ser maior que zero.")
+            print(
+                "A quantidade deve ser maior que zero."
+            )
             continue
 
         return valor
@@ -60,6 +70,7 @@ def ler_codigo_instrumento():
     """
 
     while True:
+
         codigo = input(
             "Digite o código do instrumento: "
         ).strip().upper()
@@ -67,12 +78,14 @@ def ler_codigo_instrumento():
         if codigo:
             return codigo
 
-        print("O código não pode ficar vazio.")
+        print(
+            "O código não pode ficar vazio."
+        )
 
 
 def criar_instrumento():
     """
-    Permite ao usuário escolher entre moeda fiduciária
+    Permite escolher entre moeda fiduciária
     e criptoativo.
     """
 
@@ -81,158 +94,187 @@ def criar_instrumento():
     print("2 - Criptoativo")
 
     while True:
-        opcao = input("Escolha: ").strip()
+
+        opcao = input(
+            "Escolha: "
+        ).strip()
 
         if opcao == "1":
+
             codigo = ler_codigo_instrumento()
+
             return MoedaFiat(codigo)
 
-        if opcao == "2":
+        elif opcao == "2":
+
             codigo = ler_codigo_instrumento()
+
             return Criptoativo(codigo)
 
-        print("Opção inválida.")
+        else:
+
+            print(
+                "Opção inválida. "
+                "Escolha 1 ou 2."
+            )
 
 
 # ==========================================================
-# RF1
+# RF1 - COTAÇÕES IMUTÁVEIS
 # ==========================================================
 
 def demonstrar_rf1():
-    """
-    RF1 - Cotações imutáveis.
-    """
 
     print("\n" + "=" * 60)
     print("RF1 - COTAÇÕES IMUTÁVEIS")
     print("=" * 60)
 
+    codigo_origem = ler_codigo_instrumento()
+
+    moeda_destino = input(
+        "Digite a moeda de referência: "
+    ).strip().upper()
+
+    valor = ler_quantidade(
+        "Digite o valor da cotação: "
+    )
+
     cotacao = Cotacao(
-        "USD",
-        "BRL",
-        Decimal("5.43"),
+        codigo_origem,
+        moeda_destino,
+        valor,
         datetime.now()
     )
 
     print("\nCotação registrada:")
+
     print(cotacao)
 
     print(
-        "\nA cotação representa um registro daquele momento."
+        "\nA cotação registrada representa "
+        "um registro fixo daquele momento."
     )
 
     print(
-        "Uma nova cotação deve ser criada como um novo registro."
+        "Uma nova cotação deve ser registrada "
+        "como um novo objeto."
     )
 
 
 # ==========================================================
-# RF2
+# RF2 - DINHEIRO
 # ==========================================================
 
 def demonstrar_rf2():
-    """
-    RF2 - Não permitir mistura implícita de moedas.
-    """
 
     print("\n" + "=" * 60)
     print("RF2 - SEM MISTURA IMPLÍCITA DE MOEDAS")
     print("=" * 60)
 
+    print("\nPrimeiro valor")
+
     valor1 = ler_decimal(
-        "\nDigite o primeiro valor em BRL: "
+        "Digite o valor: "
     )
 
+    moeda1 = input(
+        "Digite a moeda: "
+    ).strip().upper()
+
+    print("\nSegundo valor")
+
     valor2 = ler_decimal(
-        "Digite o segundo valor em BRL: "
+        "Digite o valor: "
     )
+
+    moeda2 = input(
+        "Digite a moeda: "
+    ).strip().upper()
 
     dinheiro1 = Dinheiro(
         valor1,
-        "BRL"
+        moeda1
     )
 
     dinheiro2 = Dinheiro(
         valor2,
-        "BRL"
-    )
-
-    print(
-        "\nResultado da soma:"
-    )
-
-    print(
-        dinheiro1 + dinheiro2
-    )
-
-    print("\nAgora será testada a mistura de moedas.")
-
-    valor_usd = ler_decimal(
-        "Digite um valor em USD: "
+        moeda2
     )
 
     try:
 
-        dinheiro_usd = Dinheiro(
-            valor_usd,
-            "USD"
-        )
+        resultado = dinheiro1 + dinheiro2
 
-        resultado = dinheiro1 + dinheiro_usd
+        print(
+            "\nResultado da soma:"
+        )
 
         print(resultado)
 
     except (ValueError, TypeError) as erro:
 
         print(
-            "\nMistura bloqueada corretamente:"
+            "\nOperação bloqueada."
         )
 
-        print(erro)
+        print(
+            f"Não é permitido somar "
+            f"{moeda1} com {moeda2} "
+            f"sem conversão explícita."
+        )
+
+        print(
+            f"Detalhe: {erro}"
+        )
 
 
 # ==========================================================
-# RF3
+# RF3 - HERANÇA
 # ==========================================================
 
 def demonstrar_rf3():
-    """
-    RF3 - Herança entre instrumentos.
-    """
 
     print("\n" + "=" * 60)
     print("RF3 - FAMÍLIAS DE INSTRUMENTOS")
     print("=" * 60)
 
-    print("\n1 - Moeda fiduciária")
+    print("\n--- MOEDA FIDUCIÁRIA ---")
+
     codigo_fiat = ler_codigo_instrumento()
 
-    fiat = MoedaFiat(codigo_fiat)
+    fiat = MoedaFiat(
+        codigo_fiat
+    )
 
-    print("\n2 - Criptoativo")
+    print("\n--- CRIPTOATIVO ---")
+
     codigo_crypto = ler_codigo_instrumento()
 
-    crypto = Criptoativo(codigo_crypto)
+    crypto = Criptoativo(
+        codigo_crypto
+    )
 
-    print("\nInstrumentos cadastrados:")
-
-    print(fiat)
-    print(crypto)
+    print("\nInstrumentos criados:")
 
     print(
-        "\nOs dois pertencem à família Instrumento,"
-        " mas possuem comportamentos próprios."
+        f"Fiat:   {fiat}"
+    )
+
+    print(
+        f"Crypto: {crypto}"
+    )
+
+    print(
+        "\nOs dois pertencem à família "
+        "Instrumento."
     )
 
 
 # ==========================================================
-# RF4
+# RF4 - EXIBIÇÃO E VOLATILIDADE
 # ==========================================================
 
 def demonstrar_rf4():
-    """
-    RF4 - Exibição apropriada ao tipo de instrumento.
-    """
 
     print("\n" + "=" * 60)
     print("RF4 - EXIBIÇÃO E VOLATILIDADE")
@@ -241,7 +283,7 @@ def demonstrar_rf4():
     instrumento = criar_instrumento()
 
     valor = ler_decimal(
-        "\nDigite o valor para exibição: "
+        "\nDigite um valor para exibição: "
     )
 
     print("\nValor formatado:")
@@ -258,20 +300,20 @@ def demonstrar_rf4():
 
 
 # ==========================================================
-# RF5
+# RF5 - POSIÇÕES DA CARTEIRA
 # ==========================================================
 
-def demonstrar_rf5(carteira, servico):
-    """
-    RF5 - Carteira heterogênea.
-    """
+def demonstrar_rf5(
+    carteira,
+    servico
+):
 
     print("\n" + "=" * 60)
     print("RF5 - AVALIAÇÃO MISTA DA CARTEIRA")
     print("=" * 60)
 
     print(
-        "\nVamos adicionar uma posição à carteira."
+        "\nAdicionando uma nova posição."
     )
 
     instrumento = criar_instrumento()
@@ -289,17 +331,16 @@ def demonstrar_rf5(carteira, servico):
         "\nPosição adicionada com sucesso."
     )
 
-    carteira.exibir(servico)
+    carteira.exibir(
+        servico
+    )
 
 
 # ==========================================================
-# RF6
+# RF6 - COTAÇÃO MULTIFONTE
 # ==========================================================
 
 def demonstrar_rf6(servico):
-    """
-    RF6 - Cotações multifonte uniformes.
-    """
 
     print("\n" + "=" * 60)
     print("RF6 - COTAÇÕES MULTIFONTE")
@@ -314,98 +355,207 @@ def demonstrar_rf6(servico):
             "BRL"
         )
 
-        print("\nCotação encontrada:")
+        print(
+            "\nCotação encontrada:"
+        )
 
         print(cotacao)
 
     except ValueError as erro:
 
         print(
-            "\nNão foi possível obter a cotação:"
+            "\nNão foi possível obter "
+            "a cotação."
         )
 
-        print(erro)
+        print(
+            f"Detalhe: {erro}"
+        )
 
 
 # ==========================================================
-# RF7
+# RF7 - CARTEIRA PROTEGIDA
 # ==========================================================
 
-def demonstrar_rf7(carteira_protegida):
-    """
-    RF7 - Carteira protegida.
-    """
+def demonstrar_rf7(
+    carteira_protegida
+):
 
-    print("\n" + "=" * 60)
-    print("RF7 - CARTEIRA PROTEGIDA")
-    print("=" * 60)
+    while True:
 
-    print(
-        f"\nSaldo atual: "
-        f"R$ {carteira_protegida.saldo:.2f}"
-    )
-
-    print(
-        "\nSerá realizada uma compra."
-    )
-
-    instrumento = criar_instrumento()
-
-    quantidade = ler_quantidade(
-        "Digite a quantidade comprada: "
-    )
-
-    valor = ler_quantidade(
-        "Digite o valor total da compra: R$ "
-    )
-
-    try:
-
-        carteira_protegida.comprar(
-            instrumento,
-            quantidade,
-            valor
-        )
+        print("\n" + "=" * 60)
+        print("RF7 - CARTEIRA PROTEGIDA")
+        print("=" * 60)
 
         print(
-            "\nCompra realizada com sucesso."
-        )
-
-        print(
-            f"Novo saldo: "
+            f"\nSaldo atual: "
             f"R$ {carteira_protegida.saldo:.2f}"
         )
 
-        carteira_protegida.listar_posicoes()
+        print("\n1 - Depositar")
+        print("2 - Sacar")
+        print("3 - Comprar ativo")
+        print("4 - Ver posições")
+        print("0 - Voltar")
 
-    except ValueError as erro:
+        opcao = input(
+            "\nEscolha uma opção: "
+        ).strip()
 
-        print(
-            "\nOperação recusada:"
-        )
+        # --------------------------------------------------
+        # DEPÓSITO
+        # --------------------------------------------------
 
-        print(erro)
+        if opcao == "1":
 
-        print(
-            f"Saldo permanece: "
-            f"R$ {carteira_protegida.saldo:.2f}"
-        )
+            valor = ler_quantidade(
+                "\nDigite o valor do depósito: R$ "
+            )
+
+            try:
+
+                carteira_protegida.depositar(
+                    valor
+                )
+
+                print(
+                    "\nDepósito realizado "
+                    "com sucesso."
+                )
+
+                print(
+                    f"Novo saldo: "
+                    f"R$ {carteira_protegida.saldo:.2f}"
+                )
+
+            except ValueError as erro:
+
+                print(
+                    f"\nOperação recusada: "
+                    f"{erro}"
+                )
+
+        # --------------------------------------------------
+        # SAQUE
+        # --------------------------------------------------
+
+        elif opcao == "2":
+
+            valor = ler_quantidade(
+                "\nDigite o valor do saque: R$ "
+            )
+
+            try:
+
+                carteira_protegida.sacar(
+                    valor
+                )
+
+                print(
+                    "\nSaque realizado "
+                    "com sucesso."
+                )
+
+                print(
+                    f"Novo saldo: "
+                    f"R$ {carteira_protegida.saldo:.2f}"
+                )
+
+            except ValueError as erro:
+
+                print(
+                    f"\nOperação recusada: "
+                    f"{erro}"
+                )
+
+        # --------------------------------------------------
+        # COMPRA
+        # --------------------------------------------------
+
+        elif opcao == "3":
+
+            print(
+                "\n--- COMPRA DE ATIVO ---"
+            )
+
+            instrumento = criar_instrumento()
+
+            quantidade = ler_quantidade(
+                "Digite a quantidade comprada: "
+            )
+
+            valor = ler_quantidade(
+                "Digite o valor total da compra: R$ "
+            )
+
+            try:
+
+                carteira_protegida.comprar(
+                    instrumento,
+                    quantidade,
+                    valor
+                )
+
+                print(
+                    "\nCompra realizada "
+                    "com sucesso."
+                )
+
+                print(
+                    f"Novo saldo: "
+                    f"R$ {carteira_protegida.saldo:.2f}"
+                )
+
+            except ValueError as erro:
+
+                print(
+                    f"\nCompra recusada: "
+                    f"{erro}"
+                )
+
+        # --------------------------------------------------
+        # POSIÇÕES
+        # --------------------------------------------------
+
+        elif opcao == "4":
+
+            carteira_protegida.listar_posicoes()
+
+        # --------------------------------------------------
+        # VOLTAR
+        # --------------------------------------------------
+
+        elif opcao == "0":
+
+            print(
+                "\nVoltando ao menu principal..."
+            )
+
+            break
+
+        else:
+
+            print(
+                "\nOpção inválida."
+            )
 
 
 # ==========================================================
 # CONSULTAR CARTEIRA
 # ==========================================================
 
-def consultar_carteira(carteira, servico):
-    """
-    Exibe as posições atuais e o valor total.
-    """
+def consultar_carteira(
+    carteira,
+    servico
+):
 
     print("\n" + "=" * 60)
     print("CONSULTA DA CARTEIRA")
     print("=" * 60)
 
-    carteira.exibir(servico)
+    carteira.exibir(
+        servico
+    )
 
 
 # ==========================================================
@@ -413,10 +563,6 @@ def consultar_carteira(carteira, servico):
 # ==========================================================
 
 def exibir_menu():
-    """
-
-    Exibe o menu principal do sistema.
-    """
 
     print("\n")
     print("=" * 60)
@@ -429,7 +575,7 @@ def exibir_menu():
     print("4 - RF4 - Exibição e volatilidade")
     print("5 - RF5 - Adicionar posição")
     print("6 - RF6 - Consultar cotação multifonte")
-    print("7 - RF7 - Comprar ativo")
+    print("7 - RF7 - Carteira protegida")
     print("8 - Consultar carteira")
     print("0 - Sair")
 
@@ -458,17 +604,21 @@ def main():
     )
 
     # ------------------------------------------------------
-    # CARTEIRAS
+    # CARTEIRA
     # ------------------------------------------------------
 
     carteira = Carteira()
+
+    # ------------------------------------------------------
+    # CARTEIRA PROTEGIDA
+    # ------------------------------------------------------
 
     carteira_protegida = CarteiraProtegida(
         Decimal("5000.00")
     )
 
     # ------------------------------------------------------
-    # MENU
+    # MENU PRINCIPAL
     # ------------------------------------------------------
 
     while True:
@@ -523,20 +673,22 @@ def main():
 
         elif opcao == "0":
 
-            print("\nEncerrando o sistema...")
-
+            print("\n" + "=" * 60)
             print(
-                "Obrigado por utilizar "
-                "o Painel de Moedas e Economia."
+                "Encerrando o Painel de Moedas e Economia..."
             )
+            print("=" * 60)
 
             break
 
         else:
 
             print(
-                "\nOpção inválida. "
-                "Escolha uma opção do menu."
+                "\nOpção inválida."
+            )
+
+            print(
+                "Digite uma opção entre 0 e 8."
             )
 
 
