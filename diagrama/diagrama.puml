@@ -1,1 +1,143 @@
+@startuml
 
+title Painel de Moedas e Economia - Diagrama de Classes
+
+skinparam classAttributeIconSize 0
+
+' ==========================================================
+' MODELOS
+' ==========================================================
+
+package "modelos" {
+
+    abstract class Instrumento {
+        - _codigo : str
+        + codigo : str
+        + calcular_volatilidade() : str
+        + formatar_valor(valor : Decimal) : str
+    }
+
+    class MoedaFiat {
+        + calcular_volatilidade() : str
+        + formatar_valor(valor : Decimal) : str
+    }
+
+    class Criptoativo {
+        + calcular_volatilidade() : str
+        + formatar_valor(valor : Decimal) : str
+    }
+
+    class Dinheiro {
+        - _valor : Decimal
+        - _moeda : str
+        + valor : Decimal
+        + moeda : str
+        + __add__(outro : Dinheiro) : Dinheiro
+    }
+
+    class Cotacao {
+        - _origem : str
+        - _destino : str
+        - _valor : Decimal
+        - _instante : datetime
+        + origem : str
+        + destino : str
+        + valor : Decimal
+        + instante : datetime
+    }
+
+    class Posicao {
+        - __instrumento : Instrumento
+        - __quantidade : Decimal
+        + instrumento : Instrumento
+        + quantidade : Decimal
+        + valor_em_reais(servico) : Decimal
+    }
+
+    class Carteira {
+        - __posicoes : list
+        + adicionar_posicao(instrumento, quantidade)
+        + obter_posicoes()
+        + calcular_total(servico) : Decimal
+        + exibir(servico)
+    }
+
+    class CarteiraProtegida {
+        - __saldo : Decimal
+        - __posicoes : list
+        + saldo : Decimal
+        + depositar(valor)
+        + sacar(valor)
+        + comprar(instrumento, quantidade, valor_total)
+        + listar_posicoes()
+    }
+}
+
+
+' ==========================================================
+' PROVEDORES
+' ==========================================================
+
+package "provedores" {
+
+    abstract class ProvedorCotacao {
+        + obter_cotacao(instrumento, moeda_referencia) : Cotacao
+    }
+
+    class ProvedorFiat {
+        - __cotacoes : dict
+        + obter_cotacao(instrumento, moeda_referencia) : Cotacao
+    }
+
+    class ProvedorCripto {
+        - __cotacoes : dict
+        + obter_cotacao(instrumento, moeda_referencia) : Cotacao
+    }
+}
+
+
+' ==========================================================
+' SERVIÇOS
+' ==========================================================
+
+package "servicos" {
+
+    class ServicoCotacao {
+        - __provedores : tuple
+        + obter_cotacao(instrumento, moeda_referencia) : Cotacao
+    }
+}
+
+
+' ==========================================================
+' HERANÇA
+' ==========================================================
+
+Instrumento <|-- MoedaFiat
+Instrumento <|-- Criptoativo
+
+ProvedorCotacao <|-- ProvedorFiat
+ProvedorCotacao <|-- ProvedorCripto
+
+
+' ==========================================================
+' RELACIONAMENTOS
+' ==========================================================
+
+Carteira "1" *-- "0..*" Posicao
+
+CarteiraProtegida "1" *-- "0..*" Posicao
+
+Posicao "*" --> "1" Instrumento
+
+Posicao ..> ServicoCotacao
+
+ServicoCotacao "1" o-- "1..*" ProvedorCotacao
+
+ProvedorFiat ..> Cotacao
+ProvedorCripto ..> Cotacao
+
+Cotacao ..> Dinheiro
+
+
+@enduml
