@@ -7,14 +7,14 @@ trabalhando com cotações, posições e operações financeiras protegidas.
 
 > **Status: Em desenvolvimento — RF1 até RF7**
 
-## 🛠 Tecnologias
+##  Tecnologias
 
 - Python 3
 - Programação Orientada a Objetos
 - `Decimal`
 - PlantUML
 
-## 📋 Requisitos implementados
+##  Requisitos implementados
 
 | RF | Descrição |
 |---|---|
@@ -26,7 +26,7 @@ trabalhando com cotações, posições e operações financeiras protegidas.
 | RF6 | Cotações multifonte |
 | RF7 | Carteira protegida |
 
-## 📁 Estrutura
+##  Estrutura
 
 ```text
 painel_moedas/
