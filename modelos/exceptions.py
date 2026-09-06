@@ -1,15 +1,14 @@
-# (isolar os erros)
-
-class FinanceError(Exception):
-    # Classe base para todos os erros financeiros do sistema.
+class ErroFinanceiro(Exception):
+    """Classe base para erros da carteira."""
     pass
 
-class InsufficientBalanceError(FinanceError):
-    # Lançado quando o usuário tenta vender mais de um ativo do que possui.
-    def __init__(self, symbol, available, requested):
-        super().__init__(f"Saldo insuficiente para {symbol}. Disponível: {available}, Tentativa de venda: {requested}")
+class SaldoInsuficienteError(ErroFinanceiro):
+    def __init__(self, saldo_atual, valor_tentado):
+        super().__init__(
+            f"Saldo insuficiente. Disponível: R$ {saldo_atual:.2f}, "
+            f"Tentativa de compra: R$ {valor_tentado:.2f}"
+        )
 
-class UnknownAssetError(FinanceError):
-    # Lançado quando se tenta negociar um símbolo que não existe
-    def __init__(self, symbol):
-        super().__init__(f"Ativo desconhecido: {symbol}")
+class QuantidadeInvalidaError(ErroFinanceiro):
+    def __init__(self, mensagem="A quantidade e o valor devem ser maiores que zero."):
+        super().__init__(mensagem)
