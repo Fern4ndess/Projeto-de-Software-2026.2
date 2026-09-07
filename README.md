@@ -5,7 +5,7 @@ Projeto desenvolvido em **Python** utilizando Programação Orientada a Objetos 
 O sistema representa uma carteira com moedas fiduciárias e criptoativos,
 trabalhando com cotações, posições e operações financeiras protegidas.
 
-> **Status: Em desenvolvimento — RF1 até RF7**
+> **Status: Em desenvolvimento — RF1 até RF8**
 
 ##  Tecnologias
 
@@ -25,6 +25,7 @@ trabalhando com cotações, posições e operações financeiras protegidas.
 | RF5 | Avaliação mista da carteira |
 | RF6 | Cotações multifonte |
 | RF7 | Carteira protegida |
+| RF8 |  Erros financeiros distinguíveis |
 
 ##  Estrutura
 
@@ -35,8 +36,8 @@ painel_moedas/
 ├── provedores/
 ├── servicos/
 ├── diagrama/
-│   ├── diagrama_classes.puml
-│   └── diagrama_classes.png
+│   ├── diagrama.puml
+│   └── diagrama atualizado2.png
 │
 ├── main.py
 ├── README.md
