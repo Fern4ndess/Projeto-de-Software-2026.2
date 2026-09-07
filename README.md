@@ -25,6 +25,7 @@ trabalhando com cotações, posições e operações financeiras protegidas.
 | RF5 | Avaliação mista da carteira |
 | RF6 | Cotações multifonte |
 | RF7 | Carteira protegida |
+| RF9 |  Erros financeiros distinguíveis |
 
 ##  Estrutura
 
