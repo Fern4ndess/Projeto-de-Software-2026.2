@@ -36,8 +36,8 @@ painel_moedas/
 ├── provedores/
 ├── servicos/
 ├── diagrama/
-│   ├── diagrama_classes.puml
-│   └── diagrama_classes.png
+│   ├── diagrama.puml
+│   └── diagrama atualizado2.png
 │
 ├── main.py
 ├── README.md
