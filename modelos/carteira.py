@@ -66,3 +66,43 @@ class CarteiraProtegida:
             
     def obter_posicoes(self):
         return tuple(self.__posicoes)
+
+class Carteira:
+
+    def __init__(self):
+        self.__posicoes = []
+
+    def adicionar_posicao(self, instrumento, quantidade):
+        posicao = Posicao(instrumento, quantidade)
+        self.__posicoes.append(posicao)
+
+    def obter_posicoes(self):
+        return tuple(self.__posicoes)
+
+    def calcular_total(self, servico):
+        total = Decimal("0")
+        for posicao in self.__posicoes:
+            total += posicao.valor_em_reais(servico)
+        return total
+
+    def exibir(self, servico):
+        if not self.__posicoes:
+            print("\nCarteira vazia.")
+            return
+
+        print("\n" + "-" * 65)
+        print("POSIÇÕES DA CARTEIRA")
+        print("-" * 65)
+
+        for posicao in self.__posicoes:
+            instrumento = posicao.instrumento
+            valor = posicao.valor_em_reais(servico)
+            print(
+                f"{instrumento.codigo:<6} | "
+                f"Quantidade: {posicao.quantidade:<12} | "
+                f"Valor em BRL: R$ {valor:,.2f}"
+            )
+
+        print("-" * 65)
+        total = self.calcular_total(servico)
+        print(f"TOTAL DA CARTEIRA: R$ {total:,.2f}")
