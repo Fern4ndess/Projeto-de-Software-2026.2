@@ -393,6 +393,72 @@ def demonstrar_rf7(carteira_protegida):
 
 
 # ==========================================================
+# RF10
+# ==========================================================
+
+def demonstrar_rf10(servico):
+    """
+    RF10 - Cache de cotações invisível.
+    """
+
+    print("\n" + "=" * 60)
+    print("RF10 - CACHE DE COTAÇÕES INVISÍVEL")
+    print("=" * 60)
+
+    instrumento = criar_instrumento()
+
+    repeticoes = 5
+
+    print(
+        f"\nVamos consultar a cotação de {instrumento.codigo} "
+        f"{repeticoes} vezes seguidas, exatamente da mesma forma."
+    )
+
+    chamadas_reais_antes = servico.chamadas_reais
+    acertos_cache_antes = servico.acertos_cache
+
+    for numero in range(1, repeticoes + 1):
+
+        try:
+            cotacao = servico.obter_cotacao(
+                instrumento,
+                "BRL"
+            )
+
+            print(
+                f"Consulta {numero}: "
+                f"{instrumento.codigo} = R$ {cotacao.valor} "
+                f"(registrada às {cotacao.horario.strftime('%H:%M:%S.%f')})"
+            )
+
+        except ValueError as erro:
+
+            print(f"Consulta {numero}: erro -> {erro}")
+            return
+
+    chamadas_reais_depois = servico.chamadas_reais
+    acertos_cache_depois = servico.acertos_cache
+
+    print(
+        f"\nChamadas reais ao provedor neste teste: "
+        f"{chamadas_reais_depois - chamadas_reais_antes}"
+    )
+
+    print(
+        f"Respostas devolvidas pelo cache neste teste: "
+        f"{acertos_cache_depois - acertos_cache_antes}"
+    )
+
+    print(
+        "\nRepare no horário registrado em cada consulta: "
+        "ele se repete nas consultas que vieram do cache. "
+        "O código acima chamou 'obter_cotacao' da mesma forma "
+        "5 vezes — ele não sabe (e não precisa saber) quais "
+        "respostas vieram da rede e quais vieram do cache."
+    )
+
+
+# ==========================================================
 # CONSULTAR CARTEIRA
 # ==========================================================
 
@@ -431,6 +497,7 @@ def exibir_menu():
     print("6 - RF6 - Consultar cotação multifonte")
     print("7 - RF7 - Comprar ativo")
     print("8 - Consultar carteira")
+    print("9 - RF10 - Cache de cotações")
     print("0 - Sair")
 
     print("=" * 60)
@@ -518,6 +585,12 @@ def main():
 
             consultar_carteira(
                 carteira,
+                servico
+            )
+
+        elif opcao == "9":
+
+            demonstrar_rf10(
                 servico
             )
 
