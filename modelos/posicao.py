@@ -1,5 +1,7 @@
 from decimal import Decimal
 
+from modelos.exceptions import QuantidadeInvalidaError
+
 
 class Posicao:
 
@@ -8,7 +10,7 @@ class Posicao:
         quantidade = Decimal(str(quantidade))
 
         if quantidade <= Decimal("0"):
-            raise ValueError(
+            raise QuantidadeInvalidaError(
                 "A quantidade deve ser maior que zero."
             )
 
