@@ -1,21 +1,59 @@
 from decimal import Decimal
+
 from modelos.posicao import Posicao
 
-# EXCEÇÕES DISTINGUÍVEIS
-class ErroFinanceiro(Exception):
-    # Classe base para erros financeiros distinguíveis do sistema.
-    pass
+from modelos.exceptions import (
+    SaldoInsuficienteError,
+    QuantidadeInvalidaError
+)
 
-class SaldoInsuficienteError(ErroFinanceiro):
-    def __init__(self, saldo_atual, valor_tentado):
-        super().__init__(
-            f"Saldo insuficiente. Disponível: R$ {saldo_atual:.2f}, "
-            f"Tentativa da operação: R$ {valor_tentado:.2f}"
+
+class Carteira:
+
+    def __init__(self):
+        self.__posicoes = []
+
+    def adicionar_posicao(self, instrumento, quantidade):
+        posicao = Posicao(
+            instrumento,
+            quantidade
         )
 
-class QuantidadeInvalidaError(ErroFinanceiro):
-    def __init__(self, mensagem="A quantidade e o valor devem ser maiores que zero."):
-        super().__init__(mensagem)
+        self.__posicoes.append(posicao)
+
+    def obter_posicoes(self):
+        return tuple(self.__posicoes)
+
+    def valor_total_em_reais(self, servico):
+        total = Decimal("0")
+
+        for posicao in self.__posicoes:
+            total += posicao.valor_em_reais(servico)
+
+        return total
+
+    def exibir(self, servico):
+        print("\nPOSIÇÕES DA CARTEIRA")
+        print("-" * 40)
+
+        if not self.__posicoes:
+            print("Nenhuma posição cadastrada.")
+            return
+
+        for posicao in self.__posicoes:
+            valor = posicao.valor_em_reais(servico)
+
+            print(
+                f"{posicao.instrumento.codigo}: "
+                f"{posicao.quantidade} "
+                f"-> R$ {valor:.2f}"
+            )
+
+        print("-" * 40)
+
+        total = self.valor_total_em_reais(servico)
+
+        print(f"TOTAL DA CARTEIRA: R$ {total:.2f}")
 
 
 class CarteiraProtegida:
@@ -24,7 +62,9 @@ class CarteiraProtegida:
         saldo_inicial = Decimal(str(saldo_inicial))
 
         if saldo_inicial < Decimal("0"):
-            raise QuantidadeInvalidaError("O saldo inicial não pode ser negativo.")
+            raise QuantidadeInvalidaError(
+                "O saldo inicial não pode ser negativo."
+            )
 
         self.__saldo = saldo_inicial
         self.__posicoes = []
@@ -38,13 +78,20 @@ class CarteiraProtegida:
         valor_total = Decimal(str(valor_total))
 
         if quantidade <= Decimal("0"):
-            raise QuantidadeInvalidaError("A quantidade deve ser maior que zero.")
+            raise QuantidadeInvalidaError(
+                "A quantidade deve ser maior que zero."
+            )
 
         if valor_total <= Decimal("0"):
-            raise QuantidadeInvalidaError("O valor da operação deve ser maior que zero.")
+            raise QuantidadeInvalidaError(
+                "O valor da operação deve ser maior que zero."
+            )
 
         if valor_total > self.__saldo:
-            raise SaldoInsuficienteError(self.__saldo, valor_total)
+            raise SaldoInsuficienteError(
+                self.__saldo,
+                valor_total
+            )
 
         self.__saldo -= valor_total
 
@@ -61,8 +108,12 @@ class CarteiraProtegida:
             return
 
         print("\nPOSIÇÕES PROTEGIDAS")
+
         for posicao in self.__posicoes:
-            print(f"{posicao.instrumento.codigo} - {posicao.quantidade}")
-            
+            print(
+                f"{posicao.instrumento.codigo} - "
+                f"{posicao.quantidade}"
+            )
+
     def obter_posicoes(self):
         return tuple(self.__posicoes)
