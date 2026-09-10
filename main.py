@@ -37,20 +37,17 @@ def ler_decimal(mensagem):
     while True:
 
         try:
-
             valor = input(mensagem).strip().replace(",", ".")
 
             numero = Decimal(valor)
 
             if numero < 0:
-
                 print("O valor não pode ser negativo.")
                 continue
 
             return numero
 
         except InvalidOperation:
-
             print("Valor inválido. Digite um número.")
 
 
@@ -61,62 +58,29 @@ def ler_quantidade(mensagem):
 
     while True:
 
-        valor = input(mensagem).strip().replace(",", ".")
+        valor = ler_decimal(mensagem)
 
-        try:
+        if valor <= Decimal("0"):
+            print("A quantidade deve ser maior que zero.")
+            continue
 
-            numero = Decimal(valor)
-
-            if numero < 0:
-
-                print("A quantidade não pode ser negativa.")
-                continue
-
-            if numero == 0:
-
-                print("A quantidade deve ser maior que zero.")
-                continue
-
-            return numero
-
-        except InvalidOperation:
-
-            print("Quantidade inválida. Digite um número.")
+        return valor
 
 
 def ler_valor_positivo(mensagem):
     """
     Lê um valor monetário maior que zero.
-    Aceita vírgula ou ponto.
     """
 
     while True:
 
-        valor = input(mensagem).strip().replace(",", ".")
+        valor = ler_decimal(mensagem)
 
-        try:
+        if valor <= Decimal("0"):
+            print("O valor da operação deve ser maior que zero.")
+            continue
 
-            numero = Decimal(valor)
-
-            if numero < 0:
-
-                print("O valor da operação não pode ser negativo.")
-                continue
-
-            if numero == 0:
-
-                print(
-                    "O valor da operação deve ser maior que zero."
-                )
-                continue
-
-            return numero
-
-        except InvalidOperation:
-
-            print(
-                "Valor da operação inválido. Digite um número."
-            )
+        return valor
 
 
 def ler_codigo_instrumento():
@@ -131,7 +95,6 @@ def ler_codigo_instrumento():
         ).strip().upper()
 
         if codigo:
-
             return codigo
 
         print("O código não pode ficar vazio.")
@@ -152,15 +115,11 @@ def criar_instrumento():
         opcao = input("Escolha: ").strip()
 
         if opcao == "1":
-
             codigo = ler_codigo_instrumento()
-
             return MoedaFiat(codigo)
 
         if opcao == "2":
-
             codigo = ler_codigo_instrumento()
-
             return Criptoativo(codigo)
 
         print("Opção inválida.")
@@ -187,7 +146,6 @@ def demonstrar_rf1():
     )
 
     print("\nCotação registrada:")
-
     print(cotacao)
 
     print(
@@ -292,7 +250,6 @@ def demonstrar_rf3():
     print("\nInstrumentos cadastrados:")
 
     print(fiat)
-
     print(crypto)
 
     print(
@@ -372,8 +329,7 @@ def demonstrar_rf5(carteira, servico):
     except ValueError as erro:
 
         print(
-            "\nNão foi possível obter a cotação "
-            "de uma das posições."
+            "\nNão foi possível obter a cotação de uma das posições."
         )
 
         print(erro)
@@ -526,11 +482,23 @@ def demonstrar_rf9(carteira, servico):
 
         print("Opção inválida.")
 
-    resultado = avaliar_carteira(
-        carteira,
-        servico,
-        estrategia
-    )
+    try:
+
+        resultado = avaliar_carteira(
+            carteira,
+            servico,
+            estrategia
+        )
+
+    except ValueError as erro:
+
+        print(
+            "\nNão foi possível realizar a análise de risco."
+        )
+
+        print(erro)
+
+        return
 
     print("\nEstratégia selecionada:")
 
@@ -556,7 +524,18 @@ def consultar_carteira(carteira, servico):
     print("CONSULTA DA CARTEIRA")
     print("=" * 60)
 
-    carteira.exibir(servico)
+    try:
+
+        carteira.exibir(servico)
+
+    except ValueError as erro:
+
+        print(
+            "\nNão foi possível consultar o valor "
+            "de uma das posições."
+        )
+
+        print(erro)
 
 
 # ==========================================================
