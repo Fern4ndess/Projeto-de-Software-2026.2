@@ -12,9 +12,9 @@ class MoedaFiat(Instrumento):
         )
 
     def formatar_valor(self, valor):
-    valor = Decimal(str(valor))
+        valor = Decimal(str(valor))
 
-    return f"R$ {valor:.2f}".replace(".", ",")
+        return f"R$ {valor:.2f}".replace(".", ",")
 
     def __str__(self):
         return (
