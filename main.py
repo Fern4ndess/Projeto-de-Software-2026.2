@@ -7,10 +7,21 @@ from modelos.moeda_fiat import MoedaFiat
 from modelos.criptoativo import Criptoativo
 from modelos.carteira import Carteira, CarteiraProtegida
 
+from modelos.exceptions import (
+    SaldoInsuficienteError,
+    QuantidadeInvalidaError
+)
+
 from provedores.provedor_fiat import ProvedorFiat
 from provedores.provedor_crypto import ProvedorCripto
 
 from servicos.servicos_cotacao import ServicoCotacao
+
+from servicos.risk_analyzer import (
+    modelo_conservador,
+    modelo_agressivo,
+    avaliar_carteira
+)
 
 
 # ==========================================================
@@ -24,18 +35,22 @@ def ler_decimal(mensagem):
     """
 
     while True:
+
         try:
+
             valor = input(mensagem).strip().replace(",", ".")
 
             numero = Decimal(valor)
 
             if numero < 0:
+
                 print("O valor não pode ser negativo.")
                 continue
 
             return numero
 
         except InvalidOperation:
+
             print("Valor inválido. Digite um número.")
 
 
@@ -45,13 +60,63 @@ def ler_quantidade(mensagem):
     """
 
     while True:
-        valor = ler_decimal(mensagem)
 
-        if valor <= Decimal("0"):
-            print("A quantidade deve ser maior que zero.")
-            continue
+        valor = input(mensagem).strip().replace(",", ".")
 
-        return valor
+        try:
+
+            numero = Decimal(valor)
+
+            if numero < 0:
+
+                print("A quantidade não pode ser negativa.")
+                continue
+
+            if numero == 0:
+
+                print("A quantidade deve ser maior que zero.")
+                continue
+
+            return numero
+
+        except InvalidOperation:
+
+            print("Quantidade inválida. Digite um número.")
+
+
+def ler_valor_positivo(mensagem):
+    """
+    Lê um valor monetário maior que zero.
+    Aceita vírgula ou ponto.
+    """
+
+    while True:
+
+        valor = input(mensagem).strip().replace(",", ".")
+
+        try:
+
+            numero = Decimal(valor)
+
+            if numero < 0:
+
+                print("O valor da operação não pode ser negativo.")
+                continue
+
+            if numero == 0:
+
+                print(
+                    "O valor da operação deve ser maior que zero."
+                )
+                continue
+
+            return numero
+
+        except InvalidOperation:
+
+            print(
+                "Valor da operação inválido. Digite um número."
+            )
 
 
 def ler_codigo_instrumento():
@@ -60,11 +125,13 @@ def ler_codigo_instrumento():
     """
 
     while True:
+
         codigo = input(
             "Digite o código do instrumento: "
         ).strip().upper()
 
         if codigo:
+
             return codigo
 
         print("O código não pode ficar vazio.")
@@ -81,14 +148,19 @@ def criar_instrumento():
     print("2 - Criptoativo")
 
     while True:
+
         opcao = input("Escolha: ").strip()
 
         if opcao == "1":
+
             codigo = ler_codigo_instrumento()
+
             return MoedaFiat(codigo)
 
         if opcao == "2":
+
             codigo = ler_codigo_instrumento()
+
             return Criptoativo(codigo)
 
         print("Opção inválida.")
@@ -115,6 +187,7 @@ def demonstrar_rf1():
     )
 
     print("\nCotação registrada:")
+
     print(cotacao)
 
     print(
@@ -205,11 +278,13 @@ def demonstrar_rf3():
     print("=" * 60)
 
     print("\n1 - Moeda fiduciária")
+
     codigo_fiat = ler_codigo_instrumento()
 
     fiat = MoedaFiat(codigo_fiat)
 
     print("\n2 - Criptoativo")
+
     codigo_crypto = ler_codigo_instrumento()
 
     crypto = Criptoativo(codigo_crypto)
@@ -217,6 +292,7 @@ def demonstrar_rf3():
     print("\nInstrumentos cadastrados:")
 
     print(fiat)
+
     print(crypto)
 
     print(
@@ -289,7 +365,18 @@ def demonstrar_rf5(carteira, servico):
         "\nPosição adicionada com sucesso."
     )
 
-    carteira.exibir(servico)
+    try:
+
+        carteira.exibir(servico)
+
+    except ValueError as erro:
+
+        print(
+            "\nNão foi possível obter a cotação "
+            "de uma das posições."
+        )
+
+        print(erro)
 
 
 # ==========================================================
@@ -355,7 +442,7 @@ def demonstrar_rf7(carteira_protegida):
         "Digite a quantidade comprada: "
     )
 
-    valor = ler_quantidade(
+    valor = ler_valor_positivo(
         "Digite o valor total da compra: R$ "
     )
 
@@ -378,11 +465,9 @@ def demonstrar_rf7(carteira_protegida):
 
         carteira_protegida.listar_posicoes()
 
-    except ValueError as erro:
+    except SaldoInsuficienteError as erro:
 
-        print(
-            "\nOperação recusada:"
-        )
+        print("\nSaldo insuficiente.")
 
         print(erro)
 
@@ -390,6 +475,72 @@ def demonstrar_rf7(carteira_protegida):
             f"Saldo permanece: "
             f"R$ {carteira_protegida.saldo:.2f}"
         )
+
+    except QuantidadeInvalidaError as erro:
+
+        print("\nQuantidade ou valor inválido.")
+
+        print(erro)
+
+        print(
+            f"Saldo permanece: "
+            f"R$ {carteira_protegida.saldo:.2f}"
+        )
+
+
+# ==========================================================
+# RF9
+# ==========================================================
+
+def demonstrar_rf9(carteira, servico):
+    """
+    RF9 - Seleção de estratégia de análise de risco.
+    """
+
+    print("\n" + "=" * 60)
+    print("RF9 - ANÁLISE DE RISCO")
+    print("=" * 60)
+
+    print("\nEscolha uma estratégia:")
+
+    print("1 - Conservadora")
+    print("2 - Agressiva")
+
+    while True:
+
+        opcao = input(
+            "Digite uma opção: "
+        ).strip()
+
+        if opcao == "1":
+
+            estrategia = modelo_conservador
+
+            break
+
+        if opcao == "2":
+
+            estrategia = modelo_agressivo
+
+            break
+
+        print("Opção inválida.")
+
+    resultado = avaliar_carteira(
+        carteira,
+        servico,
+        estrategia
+    )
+
+    print("\nEstratégia selecionada:")
+
+    print(
+        estrategia.__name__
+    )
+
+    print("Classificação de risco:")
+
+    print(resultado)
 
 
 # ==========================================================
@@ -414,13 +565,15 @@ def consultar_carteira(carteira, servico):
 
 def exibir_menu():
     """
-
     Exibe o menu principal do sistema.
     """
 
     print("\n")
+
     print("=" * 60)
+
     print("       PAINEL DE MOEDAS E ECONOMIA")
+
     print("=" * 60)
 
     print("1 - RF1 - Consultar cotação")
@@ -431,6 +584,7 @@ def exibir_menu():
     print("6 - RF6 - Consultar cotação multifonte")
     print("7 - RF7 - Comprar ativo")
     print("8 - Consultar carteira")
+    print("9 - RF9 - Análise de risco")
     print("0 - Sair")
 
     print("=" * 60)
@@ -517,6 +671,13 @@ def main():
         elif opcao == "8":
 
             consultar_carteira(
+                carteira,
+                servico
+            )
+
+        elif opcao == "9":
+
+            demonstrar_rf9(
                 carteira,
                 servico
             )
