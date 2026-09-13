@@ -1,4 +1,4 @@
-@startuml
+@@startuml
 
 title Painel de Moedas e Economia - Diagrama de Classes
 
@@ -13,37 +13,37 @@ package "modelos" {
     abstract class Instrumento {
         - _codigo : str
         + codigo : str
-        + calcular_volatilidade() : str
-        + formatar_valor(valor : Decimal) : str
+        {abstract} + calcular_volatilidade() : str
+        {abstract} + formatar_valor(valor) : str
     }
 
     class MoedaFiat {
         + calcular_volatilidade() : str
-        + formatar_valor(valor : Decimal) : str
+        + formatar_valor(valor) : str
+        + __str__() : str
     }
 
     class Criptoativo {
         + calcular_volatilidade() : str
-        + formatar_valor(valor : Decimal) : str
+        + formatar_valor(valor) : str
+        + __str__() : str
     }
 
     class Dinheiro {
-        - _valor : Decimal
-        - _moeda : str
-        + valor : Decimal
+        - __valor
+        - __moeda : str
+        + valor
         + moeda : str
         + __add__(outro : Dinheiro) : Dinheiro
+        + __str__() : str
     }
 
     class Cotacao {
-        - _origem : str
-        - _destino : str
-        - _valor : Decimal
-        - _instante : datetime
-        + origem : str
-        + destino : str
-        + valor : Decimal
-        + instante : datetime
+        + moeda_origem : str
+        + moeda_destino : str
+        + valor
+        + horario : datetime
+        + __str__() : str
     }
 
     class Posicao {
@@ -57,8 +57,8 @@ package "modelos" {
     class Carteira {
         - __posicoes : list
         + adicionar_posicao(instrumento, quantidade)
-        + obter_posicoes()
-        + calcular_total(servico) : Decimal
+        + obter_posicoes() : tuple
+        + valor_total_em_reais(servico) : Decimal
         + exibir(servico)
     }
 
@@ -66,10 +66,33 @@ package "modelos" {
         - __saldo : Decimal
         - __posicoes : list
         + saldo : Decimal
-        + depositar(valor)
-        + sacar(valor)
         + comprar(instrumento, quantidade, valor_total)
         + listar_posicoes()
+        + obter_posicoes() : tuple
+    }
+
+
+    ' ======================================================
+    ' EXCEÇÕES FINANCEIRAS - RF8
+    ' ======================================================
+
+    class ErroFinanceiro {
+        <<exception>>
+    }
+
+    class SaldoInsuficienteError {
+        <<exception>>
+        + __init__(saldo_atual, valor_tentado)
+    }
+
+    class QuantidadeInvalidaError {
+        <<exception>>
+        + __init__(mensagem)
+    }
+
+    class AtivoDesconhecidoError {
+        <<exception>>
+        + __init__(codigo)
     }
 }
 
@@ -81,7 +104,7 @@ package "modelos" {
 package "provedores" {
 
     abstract class ProvedorCotacao {
-        + obter_cotacao(instrumento, moeda_referencia) : Cotacao
+        {abstract} + obter_cotacao(instrumento, moeda_referencia) : Cotacao
     }
 
     class ProvedorFiat {
@@ -93,6 +116,24 @@ package "provedores" {
         - __cotacoes : dict
         + obter_cotacao(instrumento, moeda_referencia) : Cotacao
     }
+
+    note right of ProvedorFiat
+        Nesta etapa:
+        cotações simuladas
+        em valores fixos.
+        
+        APIs externas ainda
+        não foram implementadas.
+    end note
+
+    note right of ProvedorCripto
+        Nesta etapa:
+        cotações simuladas
+        em valores fixos.
+        
+        APIs externas ainda
+        não foram implementadas.
+    end note
 }
 
 
@@ -104,24 +145,40 @@ package "servicos" {
 
     class ServicoCotacao {
         - __provedores : tuple
+        - __cache : dict
+        - __validade_cache : timedelta
         + obter_cotacao(instrumento, moeda_referencia) : Cotacao
     }
 }
 
 
 ' ==========================================================
-' HERANÇA
+' HERANÇA - INSTRUMENTOS
 ' ==========================================================
 
 Instrumento <|-- MoedaFiat
 Instrumento <|-- Criptoativo
+
+
+' ==========================================================
+' HERANÇA - PROVEDORES
+' ==========================================================
 
 ProvedorCotacao <|-- ProvedorFiat
 ProvedorCotacao <|-- ProvedorCripto
 
 
 ' ==========================================================
-' RELACIONAMENTOS
+' HERANÇA - EXCEÇÕES
+' ==========================================================
+
+ErroFinanceiro <|-- SaldoInsuficienteError
+ErroFinanceiro <|-- QuantidadeInvalidaError
+ErroFinanceiro <|-- AtivoDesconhecidoError
+
+
+' ==========================================================
+' RELACIONAMENTOS - CARTEIRAS
 ' ==========================================================
 
 Carteira "1" *-- "0..*" Posicao
@@ -130,14 +187,64 @@ CarteiraProtegida "1" *-- "0..*" Posicao
 
 Posicao "*" --> "1" Instrumento
 
+
+' ==========================================================
+' RELACIONAMENTOS - COTAÇÕES
+' ==========================================================
+
 Posicao ..> ServicoCotacao
 
 ServicoCotacao "1" o-- "1..*" ProvedorCotacao
 
+ProvedorFiat ..> MoedaFiat
+ProvedorCripto ..> Criptoativo
+
 ProvedorFiat ..> Cotacao
 ProvedorCripto ..> Cotacao
 
-Cotacao ..> Dinheiro
+
+' ==========================================================
+' RELACIONAMENTOS - DINHEIRO
+' ==========================================================
+
+Dinheiro ..> Dinheiro : soma apenas\nmesma moeda
+
+
+' ==========================================================
+' CACHE - RF10
+' ==========================================================
+
+note bottom of ServicoCotacao
+    RF10:
+    mantém cotações em cache
+    durante o período de validade.
+end note
+
+
+' ==========================================================
+' RF2
+' ==========================================================
+
+note bottom of Dinheiro
+    RF2:
+    impede a soma de valores
+    pertencentes a moedas diferentes.
+end note
+
+
+' ==========================================================
+' RF3 / RF4
+' ==========================================================
+
+note bottom of Instrumento
+    RF3:
+    Moedas fiat -> cotações diárias / 30 dias
+    Criptoativos -> preços horários / 24 horas
+
+    RF4:
+    Fiat -> 2 casas decimais
+    Cripto -> 8 casas decimais
+end note
 
 
 @enduml
