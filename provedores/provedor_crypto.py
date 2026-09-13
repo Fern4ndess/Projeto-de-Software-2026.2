@@ -3,16 +3,13 @@ from decimal import Decimal
 
 from modelos.cotacao import Cotacao
 from modelos.criptoativo import Criptoativo
-
-from provedores.provedor_cotacao import (
-    ProvedorCotacao
-)
+from modelos.exceptions import AtivoDesconhecidoError
+from provedores.provedor_cotacao import ProvedorCotacao
 
 
 class ProvedorCripto(ProvedorCotacao):
 
     def __init__(self):
-
         self.__cotacoes = {
             "BTC": Decimal("600000.00"),
             "ETH": Decimal("30000.00"),
@@ -24,7 +21,6 @@ class ProvedorCripto(ProvedorCotacao):
         instrumento,
         moeda_referencia
     ):
-
         if not isinstance(
             instrumento,
             Criptoativo
@@ -42,10 +38,7 @@ class ProvedorCripto(ProvedorCotacao):
         codigo = instrumento.codigo
 
         if codigo not in self.__cotacoes:
-            raise ValueError(
-                f"Não existe cotação simulada "
-                f"para {codigo}."
-            )
+            raise AtivoDesconhecidoError(codigo)
 
         return Cotacao(
             codigo,
