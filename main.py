@@ -9,7 +9,8 @@ from modelos.carteira import Carteira, CarteiraProtegida
 
 from modelos.exceptions import (
     SaldoInsuficienteError,
-    QuantidadeInvalidaError
+    QuantidadeInvalidaError,
+    AtivoDesconhecidoError
 )
 
 from provedores.provedor_fiat import ProvedorFiat
@@ -326,6 +327,14 @@ def demonstrar_rf5(carteira, servico):
 
         carteira.exibir(servico)
 
+    except AtivoDesconhecidoError as erro:
+
+        print(
+            "\nAtivo não encontrado:"
+        )
+
+        print(erro)
+
     except ValueError as erro:
 
         print(
@@ -360,6 +369,14 @@ def demonstrar_rf6(servico):
         print("\nCotação encontrada:")
 
         print(cotacao)
+
+    except AtivoDesconhecidoError as erro:
+
+        print(
+            "\nAtivo não encontrado:"
+        )
+
+        print(erro)
 
     except ValueError as erro:
 
@@ -527,6 +544,14 @@ def consultar_carteira(carteira, servico):
     try:
 
         carteira.exibir(servico)
+
+    except AtivoDesconhecidoError as erro:
+
+        print(
+            "\nAtivo não encontrado:"
+        )
+
+        print(erro)
 
     except ValueError as erro:
 
