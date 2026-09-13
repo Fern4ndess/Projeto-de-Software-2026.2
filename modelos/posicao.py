@@ -4,9 +4,7 @@ from modelos.exceptions import QuantidadeInvalidaError
 
 
 class Posicao:
-
     def __init__(self, instrumento, quantidade):
-
         quantidade = Decimal(str(quantidade))
 
         if quantidade <= Decimal("0"):
@@ -26,12 +24,9 @@ class Posicao:
         return self.__quantidade
 
     def valor_em_reais(self, servico):
-
         cotacao = servico.obter_cotacao(
             self.instrumento,
             "BRL"
         )
 
-        return (
-            self.quantidade * cotacao.valor
-        )
+        return self.quantidade * cotacao.valor
