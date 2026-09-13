@@ -3,16 +3,13 @@ from decimal import Decimal
 
 from modelos.cotacao import Cotacao
 from modelos.moeda_fiat import MoedaFiat
-
-from provedores.provedor_cotacao import (
-    ProvedorCotacao
-)
+from modelos.exceptions import AtivoDesconhecidoError
+from provedores.provedor_cotacao import ProvedorCotacao
 
 
 class ProvedorFiat(ProvedorCotacao):
 
     def __init__(self):
-
         self.__cotacoes = {
             "BRL": Decimal("1.00"),
             "USD": Decimal("5.43"),
@@ -25,7 +22,6 @@ class ProvedorFiat(ProvedorCotacao):
         instrumento,
         moeda_referencia
     ):
-
         if not isinstance(
             instrumento,
             MoedaFiat
@@ -43,10 +39,7 @@ class ProvedorFiat(ProvedorCotacao):
         codigo = instrumento.codigo
 
         if codigo not in self.__cotacoes:
-            raise ValueError(
-                f"Não existe cotação simulada "
-                f"para {codigo}."
-            )
+            raise AtivoDesconhecidoError(codigo)
 
         return Cotacao(
             codigo,
