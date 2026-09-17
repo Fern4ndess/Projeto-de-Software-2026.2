@@ -420,7 +420,7 @@ def demonstrar_rf6(servico):
 # RF7
 # ==========================================================
 
-def demonstrar_rf7(carteira_protegida):
+def demonstrar_rf7(carteira_protegida, servico):
     """
     RF7 - Carteira protegida.
     """
@@ -443,6 +443,51 @@ def demonstrar_rf7(carteira_protegida):
     quantidade = ler_quantidade(
         "Digite a quantidade comprada: "
     )
+
+    # ------------------------------------------------------
+    # Validação do ativo antes da compra
+    # ------------------------------------------------------
+
+    try:
+
+        servico.obter_cotacao(
+            instrumento,
+            "BRL"
+        )
+
+    except AtivoDesconhecidoError as erro:
+
+        print(
+            "\nAtivo não encontrado:"
+        )
+
+        print(erro)
+
+        print(
+            f"Saldo permanece: "
+            f"R$ {carteira_protegida.saldo:.2f}"
+        )
+
+        return
+
+    except ValueError as erro:
+
+        print(
+            "\nNão foi possível validar o ativo:"
+        )
+
+        print(erro)
+
+        print(
+            f"Saldo permanece: "
+            f"R$ {carteira_protegida.saldo:.2f}"
+        )
+
+        return
+
+    # ------------------------------------------------------
+    # Valor da compra
+    # ------------------------------------------------------
 
     valor = ler_valor_positivo(
         "Digite o valor total da compra: R$ "
@@ -700,7 +745,8 @@ def main():
         elif opcao == "7":
 
             demonstrar_rf7(
-                carteira_protegida
+                carteira_protegida,
+                servico
             )
 
         elif opcao == "8":
