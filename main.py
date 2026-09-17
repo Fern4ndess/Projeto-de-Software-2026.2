@@ -130,7 +130,7 @@ def criar_instrumento():
 # RF1
 # ==========================================================
 
-def demonstrar_rf1():
+def demonstrar_rf1(servico):
     """
     RF1 - Cotações imutáveis.
     """
@@ -139,23 +139,52 @@ def demonstrar_rf1():
     print("RF1 - COTAÇÕES IMUTÁVEIS")
     print("=" * 60)
 
-    cotacao = Cotacao(
-        "USD",
-        "BRL",
-        Decimal("5.43"),
-        datetime.now()
-    )
-
-    print("\nCotação registrada:")
-    print(cotacao)
-
     print(
-        "\nA cotação representa um registro daquele momento."
+        "\nConsulte a cotação atual de um instrumento."
     )
 
-    print(
-        "Uma nova cotação deve ser criada como um novo registro."
-    )
+    instrumento = criar_instrumento()
+
+    try:
+
+        cotacao = servico.obter_cotacao(
+            instrumento,
+            "BRL"
+        )
+
+        print("\nCotação registrada:")
+        print(cotacao)
+
+        print(
+            "\nA cotação representa um registro "
+            "daquele momento."
+        )
+
+        print(
+            "A cotação armazenada não é alterada "
+            "depois de criada."
+        )
+
+        print(
+            "\nPara obter uma nova cotação, "
+            "uma nova consulta deve ser realizada."
+        )
+
+    except AtivoDesconhecidoError as erro:
+
+        print(
+            "\nAtivo não encontrado:"
+        )
+
+        print(erro)
+
+    except ValueError as erro:
+
+        print(
+            "\nNão foi possível obter a cotação:"
+        )
+
+        print(erro)
 
 
 # ==========================================================
@@ -639,7 +668,9 @@ def main():
 
         if opcao == "1":
 
-            demonstrar_rf1()
+            demonstrar_rf1(
+                servico
+            )
 
         elif opcao == "2":
 
