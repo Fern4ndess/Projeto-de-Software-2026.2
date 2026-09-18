@@ -73,7 +73,7 @@ class Carteira:
 
         print(
             f"TOTAL DA CARTEIRA: "
-            f"R$ {total:.2f}"
+            f"R$ {total:.2f}".replace(".", ",")
         )
 
 
