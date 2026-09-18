@@ -11,7 +11,11 @@ class Instrumento(ABC):
         return self._codigo
 
     @abstractmethod
-    def calcular_volatilidade(self):
+    def calcular_volatilidade(self, cotacoes):
+        """
+        Calcula a volatilidade usando as cotações
+        adequadas ao tipo de instrumento.
+        """
         pass
 
     @abstractmethod
