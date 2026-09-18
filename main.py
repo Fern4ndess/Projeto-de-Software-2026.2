@@ -752,7 +752,7 @@ def main():
         elif opcao == "8":
 
             consultar_carteira(
-                carteira,
+                carteira_protegida,
                 servico
             )
 
