@@ -41,13 +41,30 @@ class Carteira:
             return
 
         for posicao in self.__posicoes:
+
             valor = posicao.valor_em_reais(servico)
+
+            if posicao.instrumento.codigo in (
+                "BTC",
+                "ETH",
+                "DOGE",
+                "SOL",
+                "ADA",
+                "XRP"
+            ):
+                quantidade_formatada = (
+                    f"{posicao.quantidade:.8f}"
+                )
+            else:
+                quantidade_formatada = (
+                    f"{posicao.quantidade:.2f}"
+                )
 
             print(
                 f"{posicao.instrumento.codigo}: "
-                f"{posicao.quantidade} "
+                f"{quantidade_formatada} "
                 f"-> "
-                f"{posicao.instrumento.formatar_valor(valor)}"
+                f"R$ {valor:.2f}".replace(".", ",")
             )
 
         print("-" * 40)
@@ -144,13 +161,30 @@ class CarteiraProtegida:
             return
 
         for posicao in self.__posicoes:
+
             valor = posicao.valor_em_reais(servico)
+
+            if posicao.instrumento.codigo in (
+                "BTC",
+                "ETH",
+                "DOGE",
+                "SOL",
+                "ADA",
+                "XRP"
+            ):
+                quantidade_formatada = (
+                    f"{posicao.quantidade:.8f}"
+                )
+            else:
+                quantidade_formatada = (
+                    f"{posicao.quantidade:.2f}"
+                )
 
             print(
                 f"{posicao.instrumento.codigo}: "
-                f"{posicao.quantidade} "
+                f"{quantidade_formatada} "
                 f"-> "
-                f"{posicao.instrumento.formatar_valor(valor)}"
+                f"R$ {valor:.2f}".replace(".", ",")
             )
 
         print("-" * 40)
@@ -159,5 +193,5 @@ class CarteiraProtegida:
 
         print(
             f"TOTAL DA CARTEIRA: "
-            f"R$ {total:.2f}"
+            f"R$ {total:.2f}".replace(".", ",")
         )
