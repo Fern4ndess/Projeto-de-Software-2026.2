@@ -1,23 +1,18 @@
 from decimal import Decimal, InvalidOperation
-from datetime import datetime
 
 from modelos.cotacao import Cotacao
 from modelos.dinheiro import Dinheiro
 from modelos.moeda_fiat import MoedaFiat
 from modelos.criptoativo import Criptoativo
 from modelos.carteira import Carteira, CarteiraProtegida
-
 from modelos.exceptions import (
     SaldoInsuficienteError,
     QuantidadeInvalidaError,
     AtivoDesconhecidoError
 )
-
 from provedores.provedor_fiat import ProvedorFiat
 from provedores.provedor_crypto import ProvedorCripto
-
 from servicos.servicos_cotacao import ServicoCotacao
-
 from servicos.risk_analyzer import (
     modelo_conservador,
     modelo_agressivo,
@@ -32,14 +27,15 @@ from servicos.risk_analyzer import (
 def ler_decimal(mensagem):
     """
     Lê um número decimal informado pelo usuário.
+
     Aceita vírgula ou ponto.
     """
 
     while True:
 
         try:
-            valor = input(mensagem).strip().replace(",", ".")
 
+            valor = input(mensagem).strip().replace(",", ".")
             numero = Decimal(valor)
 
             if numero < 0:
@@ -49,6 +45,7 @@ def ler_decimal(mensagem):
             return numero
 
         except InvalidOperation:
+
             print("Valor inválido. Digite um número.")
 
 
@@ -78,7 +75,9 @@ def ler_valor_positivo(mensagem):
         valor = ler_decimal(mensagem)
 
         if valor <= Decimal("0"):
-            print("O valor da operação deve ser maior que zero.")
+            print(
+                "O valor da operação deve ser maior que zero."
+            )
             continue
 
         return valor
@@ -116,11 +115,15 @@ def criar_instrumento():
         opcao = input("Escolha: ").strip()
 
         if opcao == "1":
+
             codigo = ler_codigo_instrumento()
+
             return MoedaFiat(codigo)
 
         if opcao == "2":
+
             codigo = ler_codigo_instrumento()
+
             return Criptoativo(codigo)
 
         print("Opção inválida.")
@@ -226,7 +229,9 @@ def demonstrar_rf2():
         dinheiro1 + dinheiro2
     )
 
-    print("\nAgora será testada a mistura de moedas.")
+    print(
+        "\nAgora será testada a mistura de moedas."
+    )
 
     valor_usd = ler_decimal(
         "Digite um valor em USD: "
@@ -292,9 +297,10 @@ def demonstrar_rf3():
 # RF4
 # ==========================================================
 
-def demonstrar_rf4():
+def demonstrar_rf4(servico):
     """
-    RF4 - Exibição apropriada ao tipo de instrumento.
+    RF4 - Exibição apropriada ao tipo de instrumento
+    e cálculo da volatilidade.
     """
 
     print("\n" + "=" * 60)
@@ -313,11 +319,39 @@ def demonstrar_rf4():
         instrumento.formatar_valor(valor)
     )
 
-    print("\nCritério de volatilidade:")
-
     print(
-        instrumento.calcular_volatilidade()
+        "\nConsultando histórico para "
+        "calcular a volatilidade..."
     )
+
+    try:
+
+        volatilidade = servico.calcular_volatilidade(
+            instrumento
+        )
+
+        print("\nVolatilidade:")
+
+        print(
+            f"{volatilidade:.4f}%"
+        )
+
+    except AtivoDesconhecidoError as erro:
+
+        print(
+            "\nAtivo não encontrado:"
+        )
+
+        print(erro)
+
+    except ValueError as erro:
+
+        print(
+            "\nNão foi possível calcular "
+            "a volatilidade:"
+        )
+
+        print(erro)
 
 
 # ==========================================================
@@ -367,7 +401,8 @@ def demonstrar_rf5(carteira, servico):
     except ValueError as erro:
 
         print(
-            "\nNão foi possível obter a cotação de uma das posições."
+            "\nNão foi possível obter a cotação "
+            "de uma das posições."
         )
 
         print(erro)
@@ -396,7 +431,6 @@ def demonstrar_rf6(servico):
         )
 
         print("\nCotação encontrada:")
-
         print(cotacao)
 
     except AtivoDesconhecidoError as erro:
@@ -431,7 +465,10 @@ def demonstrar_rf7(carteira_protegida, servico):
 
     print(
         f"\nSaldo atual: "
-        f"R$ {carteira_protegida.saldo:.2f}"
+        f"R$ {carteira_protegida.saldo:.2f}".replace(
+            ".",
+            ","
+        )
     )
 
     print(
@@ -465,7 +502,10 @@ def demonstrar_rf7(carteira_protegida, servico):
 
         print(
             f"Saldo permanece: "
-            f"R$ {carteira_protegida.saldo:.2f}"
+            f"R$ {carteira_protegida.saldo:.2f}".replace(
+                ".",
+                ","
+            )
         )
 
         return
@@ -480,7 +520,10 @@ def demonstrar_rf7(carteira_protegida, servico):
 
         print(
             f"Saldo permanece: "
-            f"R$ {carteira_protegida.saldo:.2f}"
+            f"R$ {carteira_protegida.saldo:.2f}".replace(
+                ".",
+                ","
+            )
         )
 
         return
@@ -507,7 +550,10 @@ def demonstrar_rf7(carteira_protegida, servico):
 
         print(
             f"Novo saldo: "
-            f"R$ {carteira_protegida.saldo:.2f}"
+            f"R$ {carteira_protegida.saldo:.2f}".replace(
+                ".",
+                ","
+            )
         )
 
         carteira_protegida.listar_posicoes()
@@ -520,18 +566,26 @@ def demonstrar_rf7(carteira_protegida, servico):
 
         print(
             f"Saldo permanece: "
-            f"R$ {carteira_protegida.saldo:.2f}"
+            f"R$ {carteira_protegida.saldo:.2f}".replace(
+                ".",
+                ","
+            )
         )
 
     except QuantidadeInvalidaError as erro:
 
-        print("\nQuantidade ou valor inválido.")
+        print(
+            "\nQuantidade ou valor inválido."
+        )
 
         print(erro)
 
         print(
             f"Saldo permanece: "
-            f"R$ {carteira_protegida.saldo:.2f}"
+            f"R$ {carteira_protegida.saldo:.2f}".replace(
+                ".",
+                ","
+            )
         )
 
 
@@ -584,7 +638,8 @@ def demonstrar_rf9(carteira, servico):
     except ValueError as erro:
 
         print(
-            "\nNão foi possível realizar a análise de risco."
+            "\nNão foi possível realizar "
+            "a análise de risco."
         )
 
         print(erro)
@@ -630,8 +685,8 @@ def consultar_carteira(carteira, servico):
     except ValueError as erro:
 
         print(
-            "\nNão foi possível consultar o valor "
-            "de uma das posições."
+            "\nNão foi possível consultar "
+            "o valor de uma das posições."
         )
 
         print(erro)
@@ -655,14 +710,23 @@ def exibir_menu():
     print("=" * 60)
 
     print("1 - RF1 - Consultar cotação")
+
     print("2 - RF2 - Trabalhar com dinheiro")
+
     print("3 - RF3 - Instrumentos")
+
     print("4 - RF4 - Exibição e volatilidade")
+
     print("5 - RF5 - Adicionar posição")
+
     print("6 - RF6 - Consultar cotação multifonte")
+
     print("7 - RF7 - Comprar ativo")
+
     print("8 - Consultar carteira")
+
     print("9 - RF9 - Análise de risco")
+
     print("0 - Sair")
 
     print("=" * 60)
@@ -727,7 +791,9 @@ def main():
 
         elif opcao == "4":
 
-            demonstrar_rf4()
+            demonstrar_rf4(
+                servico
+            )
 
         elif opcao == "5":
 
@@ -765,7 +831,9 @@ def main():
 
         elif opcao == "0":
 
-            print("\nEncerrando o sistema...")
+            print(
+                "\nEncerrando o sistema..."
+            )
 
             print(
                 "Obrigado por utilizar "
