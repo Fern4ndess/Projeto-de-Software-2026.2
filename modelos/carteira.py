@@ -46,7 +46,8 @@ class Carteira:
             print(
                 f"{posicao.instrumento.codigo}: "
                 f"{posicao.quantidade} "
-                f"-> R$ {valor:.2f}"
+                f"-> "
+                f"{posicao.instrumento.formatar_valor(valor)}"
             )
 
         print("-" * 40)
@@ -148,7 +149,8 @@ class CarteiraProtegida:
             print(
                 f"{posicao.instrumento.codigo}: "
                 f"{posicao.quantidade} "
-                f"-> R$ {valor:.2f}"
+                f"-> "
+                f"{posicao.instrumento.formatar_valor(valor)}"
             )
 
         print("-" * 40)
