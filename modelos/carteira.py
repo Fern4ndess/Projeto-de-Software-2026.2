@@ -53,7 +53,10 @@ class Carteira:
 
         total = self.valor_total_em_reais(servico)
 
-        print(f"TOTAL DA CARTEIRA: R$ {total:.2f}")
+        print(
+            f"TOTAL DA CARTEIRA: "
+            f"R$ {total:.2f}"
+        )
 
 
 class CarteiraProtegida:
@@ -73,7 +76,12 @@ class CarteiraProtegida:
     def saldo(self):
         return self.__saldo
 
-    def comprar(self, instrumento, quantidade, valor_total):
+    def comprar(
+        self,
+        instrumento,
+        quantidade,
+        valor_total
+    ):
         quantidade = Decimal(str(quantidade))
         valor_total = Decimal(str(valor_total))
 
@@ -117,3 +125,37 @@ class CarteiraProtegida:
 
     def obter_posicoes(self):
         return tuple(self.__posicoes)
+
+    def valor_total_em_reais(self, servico):
+        total = Decimal("0")
+
+        for posicao in self.__posicoes:
+            total += posicao.valor_em_reais(servico)
+
+        return total
+
+    def exibir(self, servico):
+        print("\nPOSIÇÕES DA CARTEIRA")
+        print("-" * 40)
+
+        if not self.__posicoes:
+            print("Nenhuma posição cadastrada.")
+            return
+
+        for posicao in self.__posicoes:
+            valor = posicao.valor_em_reais(servico)
+
+            print(
+                f"{posicao.instrumento.codigo}: "
+                f"{posicao.quantidade} "
+                f"-> R$ {valor:.2f}"
+            )
+
+        print("-" * 40)
+
+        total = self.valor_total_em_reais(servico)
+
+        print(
+            f"TOTAL DA CARTEIRA: "
+            f"R$ {total:.2f}"
+        )
