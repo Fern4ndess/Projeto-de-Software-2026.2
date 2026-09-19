@@ -98,8 +98,6 @@ Para criptoativos, o histórico utilizado para a volatilidade considera preços 
 
 As consultas às APIs dependem de conexão com a internet.
 
-> A integração com a CoinGecko utiliza uma chave de acesso da API. A chave utilizada no desenvolvimento deve ser protegida e não deve ser exposta em repositórios públicos.
-
 ## Volatilidade
 
 O projeto utiliza como implementação da volatilidade o **desvio-padrão dos retornos percentuais** das cotações.
