@@ -1,6 +1,7 @@
 from decimal import Decimal
 
 from modelos.posicao import Posicao
+from modelos.criptoativo import Criptoativo
 
 from modelos.exceptions import (
     SaldoInsuficienteError,
@@ -44,13 +45,9 @@ class Carteira:
 
             valor = posicao.valor_em_reais(servico)
 
-            if posicao.instrumento.codigo in (
-                "BTC",
-                "ETH",
-                "DOGE",
-                "SOL",
-                "ADA",
-                "XRP"
+            if isinstance(
+                posicao.instrumento,
+                Criptoativo
             ):
                 quantidade_formatada = (
                     f"{posicao.quantidade:.8f}"
@@ -164,13 +161,9 @@ class CarteiraProtegida:
 
             valor = posicao.valor_em_reais(servico)
 
-            if posicao.instrumento.codigo in (
-                "BTC",
-                "ETH",
-                "DOGE",
-                "SOL",
-                "ADA",
-                "XRP"
+            if isinstance(
+                posicao.instrumento,
+                Criptoativo
             ):
                 quantidade_formatada = (
                     f"{posicao.quantidade:.8f}"
