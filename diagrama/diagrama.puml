@@ -11,28 +11,26 @@ skinparam classAttributeIconSize 0
 package "modelos" {
 
     abstract class Instrumento {
-        - _codigo : str
+        # _codigo : str
         + codigo : str
-        {abstract} + calcular_volatilidade() : str
+        {abstract} + calcular_volatilidade(cotacoes) : Decimal
         {abstract} + formatar_valor(valor) : str
     }
 
     class MoedaFiat {
-        + calcular_volatilidade() : str
+        + calcular_volatilidade(cotacoes) : Decimal
         + formatar_valor(valor) : str
-        + __str__() : str
     }
 
     class Criptoativo {
-        + calcular_volatilidade() : str
+        + calcular_volatilidade(cotacoes) : Decimal
         + formatar_valor(valor) : str
-        + __str__() : str
     }
 
     class Dinheiro {
-        - __valor
+        - __valor : Decimal
         - __moeda : str
-        + valor
+        + valor : Decimal
         + moeda : str
         + __add__(outro : Dinheiro) : Dinheiro
         + __str__() : str
@@ -41,7 +39,7 @@ package "modelos" {
     class Cotacao {
         + moeda_origem : str
         + moeda_destino : str
-        + valor
+        + valor : object
         + horario : datetime
         + __str__() : str
     }
@@ -69,29 +67,22 @@ package "modelos" {
         + comprar(instrumento, quantidade, valor_total)
         + listar_posicoes()
         + obter_posicoes() : tuple
+        + valor_total_em_reais(servico) : Decimal
+        + exibir(servico)
     }
 
-
-    ' ======================================================
-    ' EXCEÇÕES FINANCEIRAS - RF8
-    ' ======================================================
-
     class ErroFinanceiro {
-        <<exception>>
     }
 
     class SaldoInsuficienteError {
-        <<exception>>
         + __init__(saldo_atual, valor_tentado)
     }
 
     class QuantidadeInvalidaError {
-        <<exception>>
         + __init__(mensagem)
     }
 
     class AtivoDesconhecidoError {
-        <<exception>>
         + __init__(codigo)
     }
 }
@@ -108,32 +99,18 @@ package "provedores" {
     }
 
     class ProvedorFiat {
-        - __cotacoes : dict
         + obter_cotacao(instrumento, moeda_referencia) : Cotacao
+        + obter_historico(
+            instrumento,
+            moeda_referencia,
+            dias
+        ) : list
     }
 
     class ProvedorCripto {
-        - __cotacoes : dict
         + obter_cotacao(instrumento, moeda_referencia) : Cotacao
+        + obter_historico(instrumento) : list
     }
-
-    note right of ProvedorFiat
-        Nesta etapa:
-        cotações simuladas
-        em valores fixos.
-        
-        APIs externas ainda
-        não foram implementadas.
-    end note
-
-    note right of ProvedorCripto
-        Nesta etapa:
-        cotações simuladas
-        em valores fixos.
-        
-        APIs externas ainda
-        não foram implementadas.
-    end note
 }
 
 
@@ -147,30 +124,46 @@ package "servicos" {
         - __provedores : tuple
         - __cache : dict
         - __validade_cache : timedelta
-        + obter_cotacao(instrumento, moeda_referencia) : Cotacao
+
+        + obter_cotacao(
+            instrumento,
+            moeda_referencia
+        ) : Cotacao
+
+        + calcular_volatilidade(
+            instrumento
+        ) : Decimal
+    }
+
+    class risk_analyzer {
+        + modelo_conservador(
+            carteira,
+            servico_cotacao
+        ) : str
+
+        + modelo_agressivo(
+            carteira,
+            servico_cotacao
+        ) : str
+
+        + avaliar_carteira(
+            carteira,
+            servico_cotacao,
+            estrategia
+        ) : str
     }
 }
 
 
 ' ==========================================================
-' HERANÇA - INSTRUMENTOS
+' HERANÇA
 ' ==========================================================
 
 Instrumento <|-- MoedaFiat
 Instrumento <|-- Criptoativo
 
-
-' ==========================================================
-' HERANÇA - PROVEDORES
-' ==========================================================
-
 ProvedorCotacao <|-- ProvedorFiat
 ProvedorCotacao <|-- ProvedorCripto
-
-
-' ==========================================================
-' HERANÇA - EXCEÇÕES
-' ==========================================================
 
 ErroFinanceiro <|-- SaldoInsuficienteError
 ErroFinanceiro <|-- QuantidadeInvalidaError
@@ -178,7 +171,7 @@ ErroFinanceiro <|-- AtivoDesconhecidoError
 
 
 ' ==========================================================
-' RELACIONAMENTOS - CARTEIRAS
+' RELACIONAMENTOS DOS MODELOS
 ' ==========================================================
 
 Carteira "1" *-- "0..*" Posicao
@@ -189,62 +182,38 @@ Posicao "*" --> "1" Instrumento
 
 
 ' ==========================================================
-' RELACIONAMENTOS - COTAÇÕES
+' RELACIONAMENTOS DE SERVIÇO
 ' ==========================================================
 
 Posicao ..> ServicoCotacao
 
 ServicoCotacao "1" o-- "1..*" ProvedorCotacao
 
-ProvedorFiat ..> MoedaFiat
-ProvedorCripto ..> Criptoativo
+ServicoCotacao ..> Instrumento
+ServicoCotacao ..> Cotacao
 
+
+' ==========================================================
+' RELACIONAMENTOS DOS PROVEDORES
+' ==========================================================
+
+ProvedorFiat ..> MoedaFiat
 ProvedorFiat ..> Cotacao
+
+ProvedorCripto ..> Criptoativo
 ProvedorCripto ..> Cotacao
 
 
 ' ==========================================================
-' RELACIONAMENTOS - DINHEIRO
+' OUTROS RELACIONAMENTOS
 ' ==========================================================
 
-Dinheiro ..> Dinheiro : soma apenas\nmesma moeda
+CarteiraProtegida ..> SaldoInsuficienteError
+CarteiraProtegida ..> QuantidadeInvalidaError
 
+Posicao ..> QuantidadeInvalidaError
 
-' ==========================================================
-' CACHE - RF10
-' ==========================================================
-
-note bottom of ServicoCotacao
-    RF10:
-    mantém cotações em cache
-    durante o período de validade.
-end note
-
-
-' ==========================================================
-' RF2
-' ==========================================================
-
-note bottom of Dinheiro
-    RF2:
-    impede a soma de valores
-    pertencentes a moedas diferentes.
-end note
-
-
-' ==========================================================
-' RF3 / RF4
-' ==========================================================
-
-note bottom of Instrumento
-    RF3:
-    Moedas fiat -> cotações diárias / 30 dias
-    Criptoativos -> preços horários / 24 horas
-
-    RF4:
-    Fiat -> 2 casas decimais
-    Cripto -> 8 casas decimais
-end note
+Dinheiro ..> Dinheiro
 
 
 @enduml
