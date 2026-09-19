@@ -37,7 +37,7 @@ O projeto implementa os requisitos funcionais:
 ```text
 diagrama/
 ├── diagrama.puml
-└── diagrama atualizado2.png
+└── diagrama.png
 
 modelos/
 ├── carteira.py
